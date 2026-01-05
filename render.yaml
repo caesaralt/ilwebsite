@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: integratd-website
+    env: node
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    autoDeploy: true
+
+
