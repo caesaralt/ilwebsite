@@ -1,12 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
 import { company } from "@/lib/site";
+import type { SiteConfig } from "@/lib/siteConfig";
 
-export function Logo() {
+export function Logo({ logo }: { logo?: SiteConfig["logo"] }) {
   const [imgError, setImgError] = useState(false);
+  const cfg: SiteConfig["logo"] = logo ?? {
+    url: "/media/integratd-living-logo.png",
+    widthPx: 290,
+    heightPx: 32,
+    offsetXPx: 0,
+    offsetYPx: 0
+  };
 
   return (
     <Link
@@ -15,14 +22,19 @@ export function Logo() {
       aria-label={`${company.name} home`}
     >
       {!imgError ? (
-        <span className="relative h-7 w-[240px] md:h-8 md:w-[290px]">
-          <Image
-            src="/media/integratd-living-logo.png"
+        <span
+          className="relative"
+          style={{
+            width: `${cfg.widthPx}px`,
+            height: `${cfg.heightPx}px`,
+            transform: `translate(${cfg.offsetXPx}px, ${cfg.offsetYPx}px)`
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={cfg.url}
             alt="Integratd Living"
-            fill
-            priority
-            sizes="(max-width: 768px) 240px, 290px"
-            className="object-contain"
+            className="absolute inset-0 h-full w-full object-contain"
             onError={() => setImgError(true)}
           />
         </span>

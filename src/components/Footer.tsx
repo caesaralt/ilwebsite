@@ -1,13 +1,32 @@
 import Link from "next/link";
 import { company, navItems } from "@/lib/site";
+import type { SiteConfig } from "@/lib/siteConfig";
 
-export function Footer() {
+export function Footer({ footerLogo }: { footerLogo?: SiteConfig["footerLogo"] }) {
   return (
     <footer className="border-t border-border/60 bg-bg">
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="grid gap-10 md:grid-cols-3">
           <div className="space-y-3">
-            <div className="font-[var(--font-display)] text-lg tracking-wide">{company.name}</div>
+            {footerLogo?.url ? (
+              <div
+                className="relative"
+                style={{
+                  width: `${footerLogo.widthPx}px`,
+                  height: `${footerLogo.heightPx}px`,
+                  transform: `translate(${footerLogo.offsetXPx}px, ${footerLogo.offsetYPx}px)`
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={footerLogo.url}
+                  alt={`${company.name} logo`}
+                  className="absolute inset-0 h-full w-full object-contain"
+                />
+              </div>
+            ) : (
+              <div className="font-[var(--font-display)] text-lg tracking-wide">{company.name}</div>
+            )}
             <p className="text-sm text-muted max-w-sm">
               Cloud-free, privacy-first automation for homes and businesses — built on Loxone.
             </p>

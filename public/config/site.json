@@ -1,0 +1,45 @@
+{
+  "hero": {
+    "enabled": false,
+    "mediaType": "image",
+    "mediaUrl": "/media/hero.mp4",
+    "posterUrl": "",
+    "overlayOpacity": 0,
+    "mediaXPercent": 50,
+    "mediaYPercent": 50,
+    "contentXPercent": 39,
+    "contentYPercent": 72,
+    "contentScale": 0.8
+  },
+  "logo": {
+    "url": "/media/logo-header.png",
+    "widthPx": 290,
+    "heightPx": 32,
+    "offsetXPx": 0,
+    "offsetYPx": 0
+  },
+  "footerLogo": {
+    "url": "/media/logo-footer.png",
+    "widthPx": 220,
+    "heightPx": 28,
+    "offsetXPx": 0,
+    "offsetYPx": 0
+  },
+  "projects": [
+    {
+      "imageUrl": "",
+      "mediaXPercent": 50,
+      "mediaYPercent": 50
+    },
+    {
+      "imageUrl": "",
+      "mediaXPercent": 50,
+      "mediaYPercent": 50
+    },
+    {
+      "imageUrl": "",
+      "mediaXPercent": 50,
+      "mediaYPercent": 50
+    }
+  ]
+}

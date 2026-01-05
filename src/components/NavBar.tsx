@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { navItems } from "@/lib/site";
 import { Logo } from "@/components/Logo";
+import type { SiteConfig } from "@/lib/siteConfig";
 
 function useLockBodyScroll(isLocked: boolean) {
   useEffect(() => {
@@ -44,7 +45,7 @@ function DiagonalMenuIcon({ expanded }: { expanded: boolean }) {
   );
 }
 
-export function NavBar() {
+export function NavBar({ logo }: { logo?: SiteConfig["logo"] }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -84,7 +85,7 @@ export function NavBar() {
       <div className="mx-auto max-w-6xl px-4 pointer-events-none">
         <div className="flex h-16 items-center justify-between gap-3">
           <div className="pointer-events-auto">
-            <Logo />
+            <Logo logo={logo} />
           </div>
 
           {/* Hidden flyout (desktop hover) + tap-to-open (mobile) */}
