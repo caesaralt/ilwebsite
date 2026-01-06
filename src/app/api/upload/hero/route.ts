@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
 import { readSiteConfig, writeSiteConfig } from "@/lib/siteConfig";
+import { isR2PublicConfigured, makeObjectKey, putPublicObject } from "@/lib/r2";
 
 export const runtime = "nodejs";
 
@@ -32,14 +31,20 @@ export async function POST(req: Request) {
     );
   }
 
-  // NOTE: This writes to the server filesystem. On some hosts, this is ephemeral unless you use a persistent disk.
-  const outDir = path.join(process.cwd(), "public", "media");
-  await fs.mkdir(outDir, { recursive: true });
+  if (!isR2PublicConfigured()) {
+    return NextResponse.json(
+      { error: "R2 is not configured. Set R2_* env vars (including R2_PUBLIC_BASE_URL) in Render to enable uploads." },
+      { status: 500 }
+    );
+  }
 
-  const filename = `hero.${ext}`;
-  const outPath = path.join(outDir, filename);
   const bytes = Buffer.from(await file.arrayBuffer());
-  await fs.writeFile(outPath, bytes);
+  const key = makeObjectKey("media/hero", file.name || `hero.${ext}`);
+  const { publicUrl } = await putPublicObject({
+    key,
+    body: bytes,
+    contentType: file.type || (isVideo ? "video/mp4" : "image/jpeg")
+  });
 
   const config = await readSiteConfig();
   const next = {
@@ -48,7 +53,7 @@ export async function POST(req: Request) {
       ...config.hero,
       enabled: true,
       mediaType: isImage ? "image" : "video",
-      mediaUrl: `/media/${filename}`
+      mediaUrl: publicUrl
     }
   };
   await writeSiteConfig(next);

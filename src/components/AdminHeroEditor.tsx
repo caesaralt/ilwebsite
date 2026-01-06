@@ -558,8 +558,8 @@ export function AdminHeroEditor() {
       </button>
 
       <div className="rounded-2xl border border-border/60 bg-bg/30 p-4 text-xs text-muted">
-        Note: uploads/settings are written to the server filesystem. If you deploy to a host with ephemeral storage,
-        you’ll want a persistent disk or object storage for media + config.
+        Note: uploads/settings are stored in Cloudflare R2 when R2 env vars are configured (recommended for Render).
+        If R2 isn’t configured, uploads will fail on production.
       </div>
     </div>
   );

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
 import { readSiteConfig, writeSiteConfig } from "@/lib/siteConfig";
+import { isR2PublicConfigured, makeObjectKey, putPublicObject } from "@/lib/r2";
 
 export const runtime = "nodejs";
 
@@ -33,18 +32,25 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Only image files (png/jpg/webp) are allowed." }, { status: 400 });
   }
 
-  const outDir = path.join(process.cwd(), "public", "media");
-  await fs.mkdir(outDir, { recursive: true });
+  if (!isR2PublicConfigured()) {
+    return NextResponse.json(
+      { error: "R2 is not configured. Set R2_* env vars (including R2_PUBLIC_BASE_URL) in Render to enable uploads." },
+      { status: 500 }
+    );
+  }
 
-  const filename = `project-${index}.${ext}`;
-  const outPath = path.join(outDir, filename);
   const bytes = Buffer.from(await file.arrayBuffer());
-  await fs.writeFile(outPath, bytes);
+  const key = makeObjectKey(`media/projects/${index}`, file.name || `project-${index}.${ext}`);
+  const { publicUrl } = await putPublicObject({
+    key,
+    body: bytes,
+    contentType: file.type || "image/jpeg"
+  });
 
   const config = await readSiteConfig();
   const next = {
     ...config,
-    projects: config.projects.map((p, i) => (i === index ? { ...p, imageUrl: `/media/${filename}` } : p))
+    projects: config.projects.map((p, i) => (i === index ? { ...p, imageUrl: publicUrl } : p))
   };
   await writeSiteConfig(next);
   return NextResponse.json({ ok: true, config: next });

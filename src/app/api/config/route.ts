@@ -7,23 +7,32 @@ function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
 }
 
+function isAllowedAssetUrl(v: unknown): v is string {
+  if (typeof v !== "string") return false;
+  if (v === "") return true;
+  if (v.startsWith("/")) return true; // local public/ path
+  if (v.startsWith("https://")) return true; // CDN / R2 public URL
+  if (v.startsWith("http://")) return true; // allow non-https for dev
+  return false;
+}
+
 function sanitize(next: Partial<SiteConfig> | null): SiteConfig {
-  const hero = next?.hero ?? {};
-  const logo = next?.logo ?? {};
-  const footerLogo = next?.footerLogo ?? {};
+  const hero: Partial<SiteConfig["hero"]> = next?.hero ?? {};
+  const logo: Partial<SiteConfig["logo"]> = next?.logo ?? {};
+  const footerLogo: Partial<SiteConfig["footerLogo"]> = next?.footerLogo ?? {};
   const projects = Array.isArray(next?.projects) ? next?.projects : [];
 
   const enabled = typeof hero.enabled === "boolean" ? hero.enabled : defaultSiteConfig.hero.enabled;
   const mediaType = hero.mediaType === "image" ? "image" : "video";
-  const mediaUrl = typeof hero.mediaUrl === "string" && hero.mediaUrl.startsWith("/") ? hero.mediaUrl : defaultSiteConfig.hero.mediaUrl;
+  const mediaUrl = isAllowedAssetUrl(hero.mediaUrl) ? hero.mediaUrl : defaultSiteConfig.hero.mediaUrl;
   const posterUrl =
-    typeof hero.posterUrl === "string" && (hero.posterUrl === "" || hero.posterUrl.startsWith("/"))
+    isAllowedAssetUrl(hero.posterUrl)
       ? hero.posterUrl
       : defaultSiteConfig.hero.posterUrl;
 
-  const logoUrl = typeof logo.url === "string" && logo.url.startsWith("/") ? logo.url : defaultSiteConfig.logo.url;
+  const logoUrl = isAllowedAssetUrl(logo.url) ? logo.url : defaultSiteConfig.logo.url;
   const footerLogoUrl =
-    typeof footerLogo.url === "string" && footerLogo.url.startsWith("/") ? footerLogo.url : defaultSiteConfig.footerLogo.url;
+    isAllowedAssetUrl(footerLogo.url) ? footerLogo.url : defaultSiteConfig.footerLogo.url;
 
   return {
     hero: {
@@ -64,7 +73,7 @@ function sanitize(next: Partial<SiteConfig> | null): SiteConfig {
     },
     projects: defaultSiteConfig.projects.map((p, idx) => {
       const row = typeof projects[idx] === "object" && projects[idx] ? (projects[idx] as Partial<SiteConfig["projects"][number]>) : {};
-      const imageUrl = typeof row.imageUrl === "string" && (row.imageUrl === "" || row.imageUrl.startsWith("/")) ? row.imageUrl : p.imageUrl;
+      const imageUrl = isAllowedAssetUrl(row.imageUrl) ? row.imageUrl : p.imageUrl;
       return {
         imageUrl,
         mediaXPercent: typeof row.mediaXPercent === "number" ? clamp(row.mediaXPercent, 0, 100) : p.mediaXPercent,
