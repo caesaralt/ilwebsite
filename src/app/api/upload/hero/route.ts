@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readSiteConfig, writeSiteConfig } from "@/lib/siteConfig";
+import { readSiteConfig, writeSiteConfig, type SiteConfig } from "@/lib/siteConfig";
 import { isR2PublicConfigured, makeObjectKey, putPublicObject } from "@/lib/r2";
 
 export const runtime = "nodejs";
@@ -47,12 +47,13 @@ export async function POST(req: Request) {
   });
 
   const config = await readSiteConfig();
-  const next = {
+  const mediaType: SiteConfig["hero"]["mediaType"] = isImage ? "image" : "video";
+  const next: SiteConfig = {
     ...config,
     hero: {
       ...config.hero,
       enabled: true,
-      mediaType: isImage ? "image" : "video",
+      mediaType,
       mediaUrl: publicUrl
     }
   };

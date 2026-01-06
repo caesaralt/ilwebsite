@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readSiteConfig, writeSiteConfig } from "@/lib/siteConfig";
+import { readSiteConfig, writeSiteConfig, type SiteConfig } from "@/lib/siteConfig";
 import { isR2PublicConfigured, makeObjectKey, putPublicObject } from "@/lib/r2";
 
 export const runtime = "nodejs";
@@ -51,8 +51,8 @@ export async function POST(req: Request) {
   const config = await readSiteConfig();
   const next =
     target === "header"
-      ? { ...config, logo: { ...config.logo, url: publicUrl } }
-      : { ...config, footerLogo: { ...config.footerLogo, url: publicUrl } };
+      ? ({ ...config, logo: { ...config.logo, url: publicUrl } } satisfies SiteConfig)
+      : ({ ...config, footerLogo: { ...config.footerLogo, url: publicUrl } } satisfies SiteConfig);
 
   await writeSiteConfig(next);
   return NextResponse.json({ ok: true, config: next });
